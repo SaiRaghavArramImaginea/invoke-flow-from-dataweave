@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="b8424059-988b-44ed-b4cf-9572629de261" >
+		<http:listener-connection host="0.0.0.0" port="8082" />
+	</http:listener-config>
+	<flow name="invoke-flow-from-dataweaveFlow1" doc:id="2adfbc2d-87c1-4281-8e45-1c9531023284" >
+		<set-payload value='#[payload.test ++ "world"]' doc:name="Set Payload" doc:id="d4ece758-d400-4df9-b49d-ba23bcccc4c5" />
+		<logger level="INFO" doc:name="Logger" doc:id="d018fcf5-1ad6-41e0-bc24-c8086d01f42c" message="#[payload]"/>
+	</flow>
+	<flow name="invoke-flow-from-dataweaveFlow" doc:id="cdcf63ec-7eca-478e-94fe-de85dc9238ef" >
+		<http:listener doc:name="Listener" doc:id="0678cf10-bc94-428d-901d-e07a5618cf11" config-ref="HTTP_Listener_config" path="/hello"/>
+		<ee:transform doc:name="Transform Message" doc:id="b99f0a4a-c310-466c-88f6-0a4e0a5b3cca">
+			<ee:message>
+				<ee:set-payload><![CDATA[%dw 2.0
+output application/json
+---
+Mule::lookup("invoke-flow-from-dataweaveFlow1", {test: "hello"})]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+	</flow>
+</mule>
